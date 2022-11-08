@@ -1,6 +1,7 @@
 import * as pixi from 'pixi.js'
 import { PinballConfig } from '../config/config'
 import { Stand } from '../type'
+import { trigonometricRotationFromDirection } from '../util'
 import { LayoutInfo } from './layout'
 import { drawTriangle } from './triangle'
 
@@ -18,11 +19,15 @@ export function drawBall(config: PinballConfig, layout: LayoutInfo, stand: Stand
     // draw a blue arrow at the start
     let { start } = stand
     let arrow = new pixi.Graphics()
-    arrow.beginFill(0xff0000, 1)
-    arrow.lineStyle(0, 0xffffff, 1)
-    drawTriangle(arrow, 100, 100)
-    arrow.x = base.x + start.x * side
-    arrow.y = base.y + start.y * side
+    arrow.beginFill(config.ballColor, 1)
+    arrow.lineStyle({
+      color: 0xffffff,
+      width: 10,
+    })
+    drawTriangle(arrow, side * 0.7, side * 0.45)
+    arrow.x = base.x + (start.x + 0.5) * side
+    arrow.y = base.y + (start.y + 0.5) * side
+    arrow.rotation = trigonometricRotationFromDirection(start.direction)
     container.addChild(arrow)
     return container
   }

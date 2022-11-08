@@ -5,7 +5,7 @@ import { getConfig } from './config/config'
 import { drawBoard } from './display/board'
 import { getLayout } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
-import { createStand } from './logic/generate'
+import { createStand, createStart } from './logic/generate'
 import { drawBumperContainer } from './display/bumper'
 import { drawBall } from './display/ball'
 
@@ -27,9 +27,7 @@ let main = () => {
   let random = seedrandom(config.seed)
   let stand = createStand(config, random)
 
-  // TODO: remove this
-  stand.start = { x: 2, y: 2, direction: 'up' }
-  //
+  stand.start = createStart(config, random)
 
   let board: pixi.Container
   let bumperContainer: pixi.Container
