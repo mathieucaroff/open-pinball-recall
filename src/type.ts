@@ -34,6 +34,13 @@ export type Start = Position & { direction: Direction }
 export interface Stand {
   grid: Grid
   bumperArray: Bumper[]
-  start?: Start
-  journey?: number
+  start: Start
+  trail: Trail
 }
+
+export interface Mark extends Position {
+  in: Direction
+  out: Direction
+}
+
+export type Trail = Mark[]

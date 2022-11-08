@@ -8,6 +8,8 @@ import { githubCornerHTML } from './lib/githubCorner'
 import { createStand, createStart } from './logic/generate'
 import { drawBumperContainer } from './display/bumper'
 import { drawBall } from './display/ball'
+import { drawStartArrow } from './display/triangle'
+import { drawTrail } from './display/trail'
 
 let main = () => {
   // Github Corner
@@ -27,20 +29,31 @@ let main = () => {
   let random = seedrandom(config.seed)
   let stand = createStand(config, random)
 
-  stand.start = createStart(config, random)
-
+  let gameContainer: pixi.Container = new pixi.Container()
   let board: pixi.Container
   let bumperContainer: pixi.Container
-  let ballContainer: pixi.Container
+  let startArrow: pixi.Container
+  let trail: pixi.Container
+  let ball: pixi.Container
+
+  app.stage.addChild(gameContainer)
 
   let redraw = () => {
-    app.stage.removeChildren()
     board = drawBoard(config, layout)
     bumperContainer = drawBumperContainer(config, layout, stand.bumperArray)
-    ballContainer = drawBall(config, layout, stand)
-    app.stage.addChild(board)
-    app.stage.addChild(bumperContainer)
-    app.stage.addChild(ballContainer)
+    startArrow = drawStartArrow(config.ballColor, layout.side, stand.start)
+    trail = drawTrail(config.trailDotColor, layout, stand.trail)
+    ball = drawBall(config, layout, stand)
+
+    gameContainer.x = layout.boardBase.x
+    gameContainer.y = layout.boardBase.y
+
+    gameContainer.removeChildren()
+    gameContainer.addChild(board)
+    gameContainer.addChild(startArrow)
+    gameContainer.addChild(trail)
+    gameContainer.addChild(bumperContainer)
+    gameContainer.addChild(ball)
   }
   redraw()
 

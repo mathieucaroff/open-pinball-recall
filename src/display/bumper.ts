@@ -32,13 +32,11 @@ export function drawBumperContainer(
   bumperArray: Bumper[],
 ) {
   let c = new pixi.Container()
-  c.x = layout.boardPosition.x + layout.slateSize
-  c.y = layout.boardPosition.y + layout.slateSize
 
   bumperArray.forEach((bumper) => {
-    let g = drawBumper(bumper.direction, config, layout.slateSize)
-    g.x += layout.slateSize * bumper.x
-    g.y += layout.slateSize * bumper.y
+    let g = drawBumper(bumper.direction, config, layout.side)
+    g.x += layout.side * (bumper.x + 1)
+    g.y += layout.side * (bumper.y + 1)
     c.addChild(g)
   })
 

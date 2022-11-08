@@ -2,6 +2,7 @@ import { PRNG } from 'seedrandom'
 import { PinballConfig } from '../config/config'
 import { BumperDirection, Direction, GridDirection, Stand, Start } from '../type'
 import { randomPick } from '../util'
+import { computeTrail } from './compute'
 import { createGrid } from './grid'
 
 export function createStand(config: PinballConfig, random: PRNG): Stand {
@@ -60,9 +61,13 @@ export function createStand(config: PinballConfig, random: PRNG): Stand {
     return { direction, ...position }
   })
 
-  let stand = {
+  let start = createStart(config, random)
+
+  let stand: Stand = {
     bumperArray,
     grid,
+    start,
+    trail: computeTrail(config, start, grid),
   }
 
   return stand

@@ -8,11 +8,14 @@ export interface LayoutInfo {
   // Sizes and positions
   width: number
   height: number
-  slateSize: number
-  boardPosition: Position
+  // side is the size of a side of a slate
+  side: number
+  // boardBase is the board position
+  boardBase: Position
   boardSize: number
   indicatorRadius: number
   indicatorStrokeWidth: number
+  trailDotRadius: number
 }
 
 export function getLayout(config: PinballConfig) {
@@ -21,13 +24,14 @@ export function getLayout(config: PinballConfig) {
     // Sizes and positions
     width: () => window.innerWidth - 3,
     height: () => window.innerHeight - 4,
-    slateSize: ({ size, width, height }) => Math.floor(Math.min(width(), height()) / (size() + 2)),
-    boardSize: ({ size, slateSize }) => slateSize() * (size() + 2),
-    boardPosition: ({ width, height, boardSize }) => ({
+    side: ({ size, width, height }) => Math.floor(Math.min(width(), height()) / (size() + 2)),
+    boardSize: ({ size, side }) => side() * (size() + 2),
+    boardBase: ({ width, height, boardSize }) => ({
       x: (width() - boardSize()) / 2,
       y: (height() - boardSize()) / 2,
     }),
-    indicatorRadius: ({ slateSize }) => Math.floor((2 * slateSize()) / 7),
+    indicatorRadius: ({ side }) => Math.floor((2 * side()) / 7),
     indicatorStrokeWidth: ({ indicatorRadius }) => (2 * indicatorRadius()) / 5,
+    trailDotRadius: ({ side }) => Math.floor(side() / 8),
   })
 }
