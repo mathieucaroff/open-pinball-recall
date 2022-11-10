@@ -26,7 +26,11 @@ function drawBumper(direction: BumperDirection, config: PinballConfig, slateSize
   return g
 }
 
-export function drawBumperArray(config: PinballConfig, layout: LayoutInfo, bumperArray: Bumper[]) {
+export function drawBumperContainer(
+  config: PinballConfig,
+  layout: LayoutInfo,
+  bumperArray: Bumper[],
+) {
   let c = new pixi.Container()
   c.x = layout.boardPosition.x + layout.slateSize
   c.y = layout.boardPosition.y + layout.slateSize

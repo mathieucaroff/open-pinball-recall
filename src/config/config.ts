@@ -34,7 +34,7 @@ export function getConfig(location: Location) {
     // Seed
     seed: () => randomSeed(),
     // Colors
-    backgroundColor: () => 0x705028,
+    backgroundColor: () => 0x503010,
     ballColor: () => 0x18b0e8,
     boardColor: () => 0x705028,
     bumperColor: () => 0xffffff,

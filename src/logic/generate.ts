@@ -1,6 +1,6 @@
 import { PRNG } from 'seedrandom'
 import { PinballConfig } from '../config/config'
-import { Bumper, BumperDirection, GridDirection, Stand } from '../type'
+import { BumperDirection, GridDirection, Stand } from '../type'
 import { createGrid } from './grid'
 
 export function createStand(config: PinballConfig, random: PRNG): Stand {

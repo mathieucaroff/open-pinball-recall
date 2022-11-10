@@ -6,7 +6,8 @@ import { drawBoard } from './display/board'
 import { getLayout } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
 import { createStand } from './logic/generate'
-import { drawBumperArray } from './display/bumper'
+import { drawBumperContainer } from './display/bumper'
+import { drawBall } from './display/ball'
 
 let main = () => {
   // Github Corner
@@ -26,11 +27,22 @@ let main = () => {
   let random = seedrandom(config.seed)
   let stand = createStand(config, random)
 
+  // TODO: remove this
+  stand.start = { x: 2, y: 2, direction: 'up' }
+  //
+
+  let board: pixi.Container
+  let bumperContainer: pixi.Container
+  let ballContainer: pixi.Container
+
   let redraw = () => {
-    app.stage.children[0] = drawBoard(config, layout)
-    app.stage.children[0].parent = app.stage
-    app.stage.children[1] = drawBumperArray(config, layout, stand.bumperArray)
-    app.stage.children[1].parent = app.stage
+    app.stage.removeChildren()
+    board = drawBoard(config, layout)
+    bumperContainer = drawBumperContainer(config, layout, stand.bumperArray)
+    ballContainer = drawBall(config, layout, stand)
+    app.stage.addChild(board)
+    app.stage.addChild(bumperContainer)
+    app.stage.addChild(ballContainer)
   }
   redraw()
 
@@ -43,10 +55,10 @@ let main = () => {
   resize()
   window.addEventListener('resize', resize)
 
-  pixi.Ticker.shared.add(() => {
-    let a = Math.floor((Date.now() * 256) / 1000 / 60) % 256
-    app.renderer.backgroundColor = a * 0x10101
-  })
+  // pixi.Ticker.shared.add(() => {
+  //   let a = Math.floor((Date.now() * 256) / 1000 / 60) % 256
+  //   app.renderer.backgroundColor = a * 0x10101
+  // })
 }
 
 main()

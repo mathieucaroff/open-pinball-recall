@@ -29,7 +29,11 @@ export type GridDirection = BumperDirection | 'empty'
 
 export type Grid = GridDirection[][]
 
+export type Start = Position & { direction: Direction }
+
 export interface Stand {
   grid: Grid
   bumperArray: Bumper[]
+  start?: Start
+  journey?: number
 }
