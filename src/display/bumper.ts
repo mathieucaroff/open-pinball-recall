@@ -25,10 +25,11 @@ function drawBumper(direction: BumperDirection, color: number, layout: LayoutInf
   return g
 }
 
-export function drawBumperContainer(
+export function drawBumperContainerAndFillGrid(
   config: PinballConfig,
   layout: LayoutInfo,
   bumperArray: Bumper[],
+  bumperGrid: (pixi.Graphics | 'nothing')[][],
 ) {
   let c = new pixi.Container()
 
@@ -37,6 +38,7 @@ export function drawBumperContainer(
     g.x += layout.side * (bumper.x + 1)
     g.y += layout.side * (bumper.y + 1)
     c.addChild(g)
+    bumperGrid[bumper.y][bumper.x] = g
   })
 
   return c

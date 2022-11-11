@@ -7,6 +7,7 @@ export let computeTrail = (config: PinballConfig, start: Start, grid: Grid) => {
   let cursor = {
     x: start.x,
     y: start.y,
+    revealed: false,
   }
   let direction = start.direction
 

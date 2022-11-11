@@ -6,6 +6,9 @@ function randomSeed() {
 
 export interface PinballConfig {
   difficulty: string
+  /**
+   * size is the number of squares on the sides of the inner grid
+   */
   size: number
   bumperCount: number
   /**

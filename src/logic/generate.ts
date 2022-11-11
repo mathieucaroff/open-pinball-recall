@@ -1,11 +1,11 @@
 import { PRNG } from 'seedrandom'
 import { PinballConfig } from '../config/config'
-import { BumperDirection, Direction, GridDirection, Game, Start } from '../type'
+import { BumperDirection, Direction, GridDirection, Game, Start, Bumper } from '../type'
 import { randomPick } from '../util'
 import { computeTrail } from './compute'
 import { createGrid } from './grid'
 
-export function createStand(config: PinballConfig, random: PRNG): Game {
+export function createGame(config: PinballConfig, random: PRNG): Game {
   if (config.bumperCount > config.size ** 2) {
     console.error(
       'Cannot afford',
@@ -63,14 +63,15 @@ export function createStand(config: PinballConfig, random: PRNG): Game {
     return { direction, ...position }
   })
 
-  let stand: Game = {
+  let game: Game = {
     bumperArray,
     grid,
     start,
     trail: computeTrail(config, start, grid),
+    phase: 'initial',
   }
 
-  return stand
+  return game
 }
 
 export function createStart(config: PinballConfig, random: PRNG): Start {

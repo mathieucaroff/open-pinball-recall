@@ -31,16 +31,20 @@ export type Grid = GridDirection[][]
 
 export type Start = Position & { direction: Direction }
 
+export interface Mark extends Position {
+  in: Direction
+  out: Direction
+  revealed: boolean
+}
+
+export type Trail = Mark[]
+
+export type Phase = 'initial' | 'bumperView' | 'guess' | 'result' | 'end'
+
 export interface Game {
   grid: Grid
   bumperArray: Bumper[]
   start: Start
   trail: Trail
+  phase: Phase
 }
-
-export interface Mark extends Position {
-  in: Direction
-  out: Direction
-}
-
-export type Trail = Mark[]

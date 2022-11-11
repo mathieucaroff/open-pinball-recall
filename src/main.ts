@@ -5,16 +5,21 @@ import { getConfig, PinballConfig } from './config/config'
 import { drawBoard } from './display/board'
 import { getLayout } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
-import { createStand } from './logic/generate'
-import { drawBumperContainer } from './display/bumper'
+import { createGame as createGame } from './logic/generate'
+import { drawBumperContainerAndFillGrid } from './display/bumper'
 import { drawBall } from './display/ball'
 import { drawStartArrow } from './display/arrow'
 import { drawTrail } from './display/trail'
-import { moveFromDirection } from './util'
+import { moveFromDirection, opposite } from './util'
+import { GridPosition, Phase } from './type'
+import { clickSound } from './audio/sound'
+import { createGrid } from './logic/grid'
 
 let main = (config: PinballConfig) => {
   // Github Corner
   document.body.innerHTML += githubCornerHTML(packageJson.repository, packageJson.version)
+
+  let random = seedrandom(config.seed)
 
   let layout = getLayout(config)
 
@@ -22,10 +27,12 @@ let main = (config: PinballConfig) => {
     backgroundColor: config.backgroundColor,
   })
   document.body.appendChild(app.view)
-  let redrawTimeout: ReturnType<typeof setTimeout>
 
-  let random = seedrandom(config.seed)
-  let stand = createStand(config, random)
+  let game = createGame(config, random)
+
+  let bumperGrid = createGrid<pixi.Graphics | 'nothing'>(config.size, 'nothing')
+
+  let journey = 0
 
   let gameContainer: pixi.Container = new pixi.Container()
   let board: pixi.Container
@@ -36,14 +43,34 @@ let main = (config: PinballConfig) => {
 
   app.stage.addChild(gameContainer)
 
+  let handleIndicatorClick = (pos: GridPosition) => {
+    if (game.phase === 'guess') {
+      game.phase = 'result'
+
+      bumperContainer.visible = true
+      bumperContainer.children.forEach((bumper) => (bumper.visible = false))
+    }
+  }
+
   let redraw = () => {
-    board = drawBoard(config, layout)
-    bumperContainer = drawBumperContainer(config, layout, stand.bumperArray)
-    startArrow = drawStartArrow(config.ballColor, layout.ballStrokeWidth, layout.side, stand.start)
-    trail = drawTrail(config.trailDotColor, layout, stand.trail)
-    ball = drawBall(config, layout, stand)
-    trail.children.forEach((g) => (g.visible = false))
-    ball.visible = false
+    board = drawBoard(game, config, layout, handleIndicatorClick)
+    bumperContainer = drawBumperContainerAndFillGrid(config, layout, game.bumperArray, bumperGrid)
+    startArrow = drawStartArrow(config.ballColor, layout.ballStrokeWidth, layout.side, game.start)
+    trail = drawTrail(config.trailDotColor, layout, game.trail)
+    ball = drawBall(config, layout, game)
+
+    // visibility
+    bumperContainer.visible = ['bumperView', 'result', 'end'].includes(game.phase)
+    startArrow.visible = ['guess', 'result', 'end'].includes(game.phase)
+    trail.children.forEach((g, k) => {
+      g.visible = k < 2 * journey
+    })
+    ball.visible = ['result', 'end'].includes(game.phase)
+    if (game.phase === 'end') {
+      let mark = game.trail.slice(-1)[0]
+      ball.x = (mark.x + 0.5) * layout.side
+      ball.y = (mark.y + 0.5) * layout.side
+    }
 
     gameContainer.x = layout.boardBase.x
     gameContainer.y = layout.boardBase.y
@@ -57,6 +84,7 @@ let main = (config: PinballConfig) => {
   }
   redraw()
 
+  let redrawTimeout: ReturnType<typeof setTimeout>
   let resize = () => {
     layout = getLayout(config)
     app.renderer.resize(layout.width, layout.height)
@@ -66,22 +94,53 @@ let main = (config: PinballConfig) => {
   resize()
   window.addEventListener('resize', resize)
 
-  let ballAnimation = true
-  let journey = 0
+  // phase initial -> bumperView
+  let firstClickHandler = () => {
+    game.phase = 'bumperView'
+    clickSound.play()
+    bumperContainer.visible = true
+
+    // phase bumperView -> guess
+    setTimeout(() => {
+      game.phase = 'guess'
+      bumperContainer.visible = false
+      startArrow.visible = true
+      clickSound.play()
+    }, 2000)
+
+    window.removeEventListener('click', firstClickHandler)
+  }
+  window.addEventListener('click', firstClickHandler)
 
   pixi.Ticker.shared.add(() => {
     let { elapsedMS } = pixi.Ticker.shared
 
-    if (ballAnimation) {
+    if (game.phase === 'result') {
       ball.visible = true
 
       journey += elapsedMS / 256
 
-      if (journey > stand.trail.length - 0.5) {
-        ballAnimation = false
+      if (journey > game.trail.length - 0.5) {
+        game.phase = 'end'
+        clickSound.play()
+        setTimeout(() => {
+          clickSound.play()
+          bumperContainer.children.forEach((g) => (g.visible = true))
+        }, 1000)
       } else {
         // moving the ball
-        let mark = stand.trail[journey | 0]
+        let mark = game.trail[journey | 0]
+        if (journey % 1 >= 0.5 && mark.in !== opposite(mark.out) && !mark.revealed) {
+          clickSound.play()
+          let bumper = bumperGrid[mark.y - 1][mark.x - 1]
+          if (bumper === 'nothing') {
+            throw new Error(
+              `expected to find a bumper at position ${mark.x},${mark.y} but found nothing`,
+            )
+          }
+          bumper.visible = true
+          mark.revealed = true
+        }
         let diff = Math.abs((journey % 1) - 0.5)
         let direction = journey % 1 < 0.5 ? mark.in : mark.out
         let move = moveFromDirection(direction)
