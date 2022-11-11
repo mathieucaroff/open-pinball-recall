@@ -5,7 +5,7 @@ import { getConfig, PinballConfig } from './config/config'
 import { drawBoard } from './display/board'
 import { getLayout } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
-import { createGame as createGame } from './logic/generate'
+import { createGame as createGame } from './logic/game'
 import { drawBumperContainerAndFillGrid } from './display/bumper'
 import { drawBall } from './display/ball'
 import { drawStartArrow } from './display/arrow'
@@ -164,12 +164,12 @@ let main = (config: PinballConfig) => {
             bumperCount -= 3
           }
 
-          if (bumperCount < 5) {
+          if (bumperCount < 3 * size - 10) {
             size -= 1
-            bumperCount += 4
-          } else if (bumperCount > 2 * size) {
+            bumperCount += 2
+          } else if (bumperCount > 3 * size - 5) {
             size += 1
-            bumperCount -= 4
+            bumperCount -= 2
           }
 
           if (config.remaining <= 0) {
@@ -193,8 +193,10 @@ let main = (config: PinballConfig) => {
             )
           }
           window.removeEventListener('click', handleEndClick)
+          window.removeEventListener('touchend', handleEndClick)
         }
         window.addEventListener('click', handleEndClick)
+        window.addEventListener('touchend', handleEndClick)
       } else {
         // moving the ball
         let mark = game.trail[journey | 0]

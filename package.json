@@ -1,6 +1,6 @@
 {
   "name": "open-pinball-recall",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A game to train working memory",
   "repository": "https://github.com/mathieucaroff/open-pinball-recall",
   "author": "Mathieu CAROFF <mathieu.caroff@free.fr>",

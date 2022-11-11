@@ -83,7 +83,7 @@ export function createIndicator(
     drawCircle(config.indicatorColor)
   })
 
-  g.on('click', () => {
+  g.on('pointerdown', () => {
     callback({ x, y })
   })
 

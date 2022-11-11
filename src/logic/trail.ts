@@ -2,7 +2,7 @@ import { PinballConfig } from '../config/config'
 import { Grid, Start, Trail } from '../type'
 import { bumperTurn, moveFromDirection, opposite } from '../util'
 
-export let computeTrail = (config: PinballConfig, start: Start, grid: Grid) => {
+export let createTrail = (config: PinballConfig, start: Start, grid: Grid) => {
   let trail = [] as Trail
   let cursor = {
     x: start.x,
