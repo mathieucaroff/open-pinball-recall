@@ -19,6 +19,8 @@ export function createStand(config: PinballConfig, random: PRNG): Stand {
     config.bumperCount = config.size ** 2
   }
 
+  let start = createStart(config, random)
+
   let grid = createGrid<GridDirection>(config.size, 'empty')
 
   let bumperArray = Array.from({ length: config.bumperCount }, (_, k) => {
@@ -60,8 +62,6 @@ export function createStand(config: PinballConfig, random: PRNG): Stand {
     grid[position.y][position.x] = direction
     return { direction, ...position }
   })
-
-  let start = createStart(config, random)
 
   let stand: Stand = {
     bumperArray,

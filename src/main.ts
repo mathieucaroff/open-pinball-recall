@@ -1,7 +1,7 @@
 import * as pixi from 'pixi.js'
 import { default as packageJson } from '../package.json'
 import { default as seedrandom } from 'seedrandom'
-import { getConfig } from './config/config'
+import { getConfig, PinballConfig } from './config/config'
 import { drawBoard } from './display/board'
 import { getLayout } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
@@ -12,12 +12,9 @@ import { drawStartArrow } from './display/triangle'
 import { drawTrail } from './display/trail'
 import { moveFromDirection } from './util'
 
-let main = () => {
+let main = (config: PinballConfig) => {
   // Github Corner
   document.body.innerHTML += githubCornerHTML(packageJson.repository, packageJson.version)
-
-  // getting the configuration
-  let config = getConfig(location)
 
   let layout = getLayout(config)
 
@@ -63,7 +60,7 @@ let main = () => {
     layout = getLayout(config)
     app.renderer.resize(layout.width, layout.height)
     clearTimeout(redrawTimeout)
-    redrawTimeout = setTimeout(redraw, 100)
+    redrawTimeout = setTimeout(redraw, 200)
   }
   resize()
   window.addEventListener('resize', resize)
@@ -102,4 +99,11 @@ let main = () => {
   })
 }
 
-main()
+// getting the configuration
+main(getConfig(location))
+
+window.addEventListener('hashchange', () => {
+  console.clear()
+  document.body.innerHTML = ''
+  main(getConfig(location))
+})
