@@ -10,6 +10,7 @@ import { drawBumperContainer } from './display/bumper'
 import { drawBall } from './display/ball'
 import { drawStartArrow } from './display/triangle'
 import { drawTrail } from './display/trail'
+import { moveFromDirection } from './util'
 
 let main = () => {
   // Github Corner
@@ -44,6 +45,7 @@ let main = () => {
     startArrow = drawStartArrow(config.ballColor, layout.side, stand.start)
     trail = drawTrail(config.trailDotColor, layout, stand.trail)
     ball = drawBall(config, layout, stand)
+    ball.visible = false
 
     gameContainer.x = layout.boardBase.x
     gameContainer.y = layout.boardBase.y
@@ -66,10 +68,38 @@ let main = () => {
   resize()
   window.addEventListener('resize', resize)
 
-  // pixi.Ticker.shared.add(() => {
-  //   let a = Math.floor((Date.now() * 256) / 1000 / 60) % 256
-  //   app.renderer.backgroundColor = a * 0x10101
-  // })
+  let ballAnimation = true
+  let journey = 0
+
+  pixi.Ticker.shared.add(() => {
+    let { elapsedMS } = pixi.Ticker.shared
+
+    if (ballAnimation) {
+      ball.visible = true
+
+      journey += elapsedMS / 256
+
+      if (journey >= stand.trail.length) {
+        ballAnimation = false
+      } else {
+        // moving the ball
+        let mark = stand.trail[journey | 0]
+        let diff = Math.abs((journey % 1) - 0.5)
+        let direction = journey % 1 < 0.5 ? mark.in : mark.out
+        let move = moveFromDirection(direction)
+        ball.x = (mark.x + 0.5 + move.x * diff) * layout.side
+        ball.y = (mark.y + 0.5 + move.y * diff) * layout.side
+
+        // showing dots
+        if (journey % 1 >= 0.25) {
+          trail.children[(journey | 0) * 2].visible = true
+        }
+        if (journey % 1 >= 0.75) {
+          trail.children[(journey | 0) * 2 + 1].visible = true
+        }
+      }
+    }
+  })
 }
 
 main()

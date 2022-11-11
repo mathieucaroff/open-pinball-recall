@@ -16,6 +16,8 @@ export interface LayoutInfo {
   indicatorRadius: number
   indicatorStrokeWidth: number
   trailDotRadius: number
+  ballRadius: number
+  ballStrokeWidth: number
 }
 
 export function getLayout(config: PinballConfig) {
@@ -33,5 +35,7 @@ export function getLayout(config: PinballConfig) {
     indicatorRadius: ({ side }) => Math.floor((2 * side()) / 7),
     indicatorStrokeWidth: ({ indicatorRadius }) => (2 * indicatorRadius()) / 5,
     trailDotRadius: ({ side }) => Math.floor(side() / 8),
+    ballRadius: ({ side }) => Math.floor((2 * side()) / 7),
+    ballStrokeWidth: ({ ballRadius }) => (2 * ballRadius()) / 7,
   })
 }

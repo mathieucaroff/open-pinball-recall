@@ -21,6 +21,8 @@ let addSingleDot = (
     layout.trailDotRadius,
   )
 
+  g.visible = false
+
   c.addChild(g)
 }
 
