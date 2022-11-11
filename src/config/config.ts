@@ -1,4 +1,4 @@
-import { parseConfig } from './parser'
+import { resolveConfig } from './resolver'
 
 function randomSeed() {
   return Math.random().toString(36).slice(2).toUpperCase()
@@ -27,7 +27,7 @@ export interface PinballConfig {
 }
 
 export function getConfig(location: Location) {
-  let config = parseConfig<PinballConfig>(location, {
+  let config = resolveConfig<PinballConfig>(location, {
     difficulty: () => '4:5',
     size: ({ difficulty }) => +difficulty().split(':')[0],
     bumperCount: ({ difficulty }) => +difficulty().split(':')[1],

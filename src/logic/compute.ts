@@ -16,11 +16,13 @@ export let computeTrail = (config: PinballConfig, start: Start, grid: Grid) => {
     cursor.x += delta.x
     cursor.y += delta.y
     if (cursor.x <= 0 || cursor.x > config.size || cursor.y <= 0 || cursor.y > config.size) {
+      trail.push({ ...cursor, in: opposite(direction), out: direction })
       break
     }
     let bumper = grid[cursor.y - 1][cursor.x - 1]
-    let out = opposite(bumperTurn(bumper, direction))
-    trail.push({ ...cursor, in: opposite(direction), out })
+    let enter = opposite(direction)
+    let out = bumperTurn(bumper, enter)
+    trail.push({ ...cursor, in: enter, out })
     direction = out
     k += 1
   }

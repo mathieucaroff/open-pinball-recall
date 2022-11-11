@@ -3,26 +3,25 @@ import { PinballConfig } from '../config/config'
 import { Bumper, BumperDirection } from '../type'
 import { LayoutInfo } from './layout'
 
-function drawBumper(direction: BumperDirection, config: PinballConfig, slateSize: number) {
+function drawBumper(direction: BumperDirection, color: number, layout: LayoutInfo) {
+  let { bumperWidth, bumperHeight, side } = layout
+
   let g = new pixi.Graphics()
-  g.beginFill(config.bumperColor)
+  g.beginFill(color)
   g.lineStyle({
-    width: slateSize / 10,
-    color: config.bumperColor,
+    width: side / 10,
+    color,
     alpha: 0.5,
   })
 
-  let bumperWidth = (4 * slateSize) / 5
-  let bumperHeight = slateSize / 8
-
-  g.drawRoundedRect(-bumperWidth / 2, -bumperHeight / 2, bumperWidth, bumperHeight, slateSize / 8)
+  g.drawRoundedRect(-bumperWidth / 2, -bumperHeight / 2, bumperWidth, bumperHeight, side / 8)
 
   g.rotation = Math.PI / 4
   if (direction === 'diagonalUp') {
     g.rotation *= -1
   }
-  g.x = slateSize / 2
-  g.y = slateSize / 2
+  g.x = side / 2
+  g.y = side / 2
   return g
 }
 
@@ -34,7 +33,7 @@ export function drawBumperContainer(
   let c = new pixi.Container()
 
   bumperArray.forEach((bumper) => {
-    let g = drawBumper(bumper.direction, config, layout.side)
+    let g = drawBumper(bumper.direction, config.bumperColor, layout)
     g.x += layout.side * (bumper.x + 1)
     g.y += layout.side * (bumper.y + 1)
     c.addChild(g)

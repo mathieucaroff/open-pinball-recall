@@ -5,10 +5,10 @@ import { getConfig, PinballConfig } from './config/config'
 import { drawBoard } from './display/board'
 import { getLayout } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
-import { createStand, createStart } from './logic/generate'
+import { createStand } from './logic/generate'
 import { drawBumperContainer } from './display/bumper'
 import { drawBall } from './display/ball'
-import { drawStartArrow } from './display/triangle'
+import { drawStartArrow } from './display/arrow'
 import { drawTrail } from './display/trail'
 import { moveFromDirection } from './util'
 
@@ -39,9 +39,10 @@ let main = (config: PinballConfig) => {
   let redraw = () => {
     board = drawBoard(config, layout)
     bumperContainer = drawBumperContainer(config, layout, stand.bumperArray)
-    startArrow = drawStartArrow(config.ballColor, layout.side, stand.start)
+    startArrow = drawStartArrow(config.ballColor, layout.ballStrokeWidth, layout.side, stand.start)
     trail = drawTrail(config.trailDotColor, layout, stand.trail)
     ball = drawBall(config, layout, stand)
+    trail.children.forEach((g) => (g.visible = false))
     ball.visible = false
 
     gameContainer.x = layout.boardBase.x
@@ -76,7 +77,7 @@ let main = (config: PinballConfig) => {
 
       journey += elapsedMS / 256
 
-      if (journey >= stand.trail.length) {
+      if (journey > stand.trail.length - 0.5) {
         ballAnimation = false
       } else {
         // moving the ball

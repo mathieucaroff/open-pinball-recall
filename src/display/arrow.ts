@@ -2,13 +2,13 @@ import * as pixi from 'pixi.js'
 import { Start } from '../type'
 import { trigonometricRotationFromDirection } from '../util'
 
-export function drawStartArrow(color: number, side: number, start: Start) {
+export function drawStartArrow(color: number, strokeWidth: number, side: number, start: Start) {
   // draw an arrow at the start
   let arrow = new pixi.Graphics()
   arrow.beginFill(color, 1)
   arrow.lineStyle({
     color: 0xffffff,
-    width: 5,
+    width: strokeWidth,
   })
   drawTriangle(arrow, side * 0.7, side * 0.45)
   arrow.x = (start.x + 0.5) * side

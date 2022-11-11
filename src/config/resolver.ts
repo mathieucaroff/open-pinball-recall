@@ -14,7 +14,7 @@ export let ensureSpacelessURL = (location: Location) => {
   }
 }
 
-export let parseConfig = <T>(location: Location, defaultConfig: DefaultConfigObject<T>) => {
+export let resolveConfig = <T>(location: Location, defaultConfig: DefaultConfigObject<T>) => {
   let config: T = {} as any
 
   // populate config with keys and key-value pairs from the URL

@@ -16,6 +16,8 @@ export interface LayoutInfo {
   indicatorRadius: number
   indicatorStrokeWidth: number
   trailDotRadius: number
+  bumperWidth: number
+  bumperHeight: number
   ballRadius: number
   ballStrokeWidth: number
 }
@@ -35,7 +37,9 @@ export function getLayout(config: PinballConfig) {
     indicatorRadius: ({ side }) => Math.floor((2 * side()) / 7),
     indicatorStrokeWidth: ({ indicatorRadius }) => (2 * indicatorRadius()) / 5,
     trailDotRadius: ({ side }) => Math.floor(side() / 8),
-    ballRadius: ({ side }) => Math.floor((2 * side()) / 7),
-    ballStrokeWidth: ({ ballRadius }) => (2 * ballRadius()) / 7,
+    bumperWidth: ({ side }) => (4 * side()) / 5,
+    bumperHeight: ({ side }) => side() / 8,
+    ballRadius: ({ side }) => Math.floor(side() / 3),
+    ballStrokeWidth: ({ ballRadius }) => ballRadius() / 3,
   })
 }

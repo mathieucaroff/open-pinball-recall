@@ -31,7 +31,7 @@ export type Grid = GridDirection[][]
 
 export type Start = Position & { direction: Direction }
 
-export interface Stand {
+export interface Game {
   grid: Grid
   bumperArray: Bumper[]
   start: Start
