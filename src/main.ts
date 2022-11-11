@@ -11,9 +11,11 @@ import { drawBall } from './display/ball'
 import { drawStartArrow } from './display/arrow'
 import { drawTrail } from './display/trail'
 import { moveFromDirection, opposite } from './util'
-import { GridPosition, Phase } from './type'
-import { clickSound } from './audio/sound'
+import { Position } from './type'
+import { clickSound, errorSound } from './audio/sound'
 import { createGrid } from './logic/grid'
+import { drawErrorDisk } from './display/error'
+import { Score } from './display/score'
 
 let main = (config: PinballConfig) => {
   // Github Corner
@@ -34,18 +36,26 @@ let main = (config: PinballConfig) => {
 
   let journey = 0
 
+  let victory: boolean
+
   let gameContainer: pixi.Container = new pixi.Container()
   let board: pixi.Container
   let bumperContainer: pixi.Container
   let startArrow: pixi.Container
   let trail: pixi.Container
   let ball: pixi.Container
+  let errorDisk: pixi.Container
+  let scoreContainer: Score
+
+  // guess is where the player guessed the ball would land
+  let guess: Position
 
   app.stage.addChild(gameContainer)
 
-  let handleIndicatorClick = (pos: GridPosition) => {
+  let handleIndicatorClick = (pos: Position) => {
     if (game.phase === 'guess') {
       game.phase = 'result'
+      guess = pos
 
       bumperContainer.visible = true
       bumperContainer.children.forEach((bumper) => (bumper.visible = false))
@@ -58,6 +68,8 @@ let main = (config: PinballConfig) => {
     startArrow = drawStartArrow(config.ballColor, layout.ballStrokeWidth, layout.side, game.start)
     trail = drawTrail(config.trailDotColor, layout, game.trail)
     ball = drawBall(config, layout, game)
+    errorDisk = drawErrorDisk(config.errorDiskColor, layout)
+    scoreContainer = new Score(layout)
 
     // visibility
     bumperContainer.visible = ['bumperView', 'result', 'end'].includes(game.phase)
@@ -71,6 +83,8 @@ let main = (config: PinballConfig) => {
       ball.x = (mark.x + 0.5) * layout.side
       ball.y = (mark.y + 0.5) * layout.side
     }
+    errorDisk.visible = false
+    // scoreContainer.visible = false
 
     gameContainer.x = layout.boardBase.x
     gameContainer.y = layout.boardBase.y
@@ -81,6 +95,8 @@ let main = (config: PinballConfig) => {
     gameContainer.addChild(trail)
     gameContainer.addChild(bumperContainer)
     gameContainer.addChild(ball)
+    gameContainer.addChild(errorDisk)
+    gameContainer.addChild(scoreContainer)
   }
   redraw()
 
@@ -95,7 +111,7 @@ let main = (config: PinballConfig) => {
   window.addEventListener('resize', resize)
 
   // phase initial -> bumperView
-  let firstClickHandler = () => {
+  setTimeout(() => {
     game.phase = 'bumperView'
     clickSound.play()
     bumperContainer.visible = true
@@ -107,10 +123,7 @@ let main = (config: PinballConfig) => {
       startArrow.visible = true
       clickSound.play()
     }, 2000)
-
-    window.removeEventListener('click', firstClickHandler)
-  }
-  window.addEventListener('click', firstClickHandler)
+  }, 1000)
 
   pixi.Ticker.shared.add(() => {
     let { elapsedMS } = pixi.Ticker.shared
@@ -122,11 +135,66 @@ let main = (config: PinballConfig) => {
 
       if (journey > game.trail.length - 0.5) {
         game.phase = 'end'
-        clickSound.play()
+        let target = game.trail.slice(-1)[0]
+        victory = target.x === guess.x && target.y === guess.y
+        if (victory) {
+          clickSound.play()
+        } else {
+          errorSound.play()
+          errorDisk.x = layout.side * (guess.x + 0.5)
+          errorDisk.y = layout.side * (guess.y + 0.5)
+          errorDisk.visible = true
+          setTimeout(() => {
+            errorDisk.visible = false
+          }, 600)
+        }
+
+        // Show the bumpers at the end
         setTimeout(() => {
           clickSound.play()
           bumperContainer.children.forEach((g) => (g.visible = true))
         }, 1000)
+
+        let handleEndClick = () => {
+          let { size, bumperCount, remaining, score, seed } = config
+          if (victory) {
+            bumperCount += 1
+            score += size * bumperCount * 10
+          } else {
+            bumperCount -= 3
+          }
+
+          if (bumperCount < 5) {
+            size -= 1
+            bumperCount += 4
+          } else if (bumperCount > 2 * size) {
+            size += 1
+            bumperCount -= 4
+          }
+
+          if (config.remaining <= 0) {
+            scoreContainer.visible = true
+            scoreContainer.setText(`Score:\n${score}`)
+            bumperContainer.visible = false
+            trail.visible = false
+          } else {
+            remaining -= 1
+            setLocationHash(
+              location,
+              {
+                difficulty: `${size}:${bumperCount}`,
+                remaining,
+                score,
+              },
+              ['size', 'bumperCount'],
+              {
+                seed: (parseInt(seed, 36) + 1).toString(36),
+              },
+            )
+          }
+          window.removeEventListener('click', handleEndClick)
+        }
+        window.addEventListener('click', handleEndClick)
       } else {
         // moving the ball
         let mark = game.trail[journey | 0]
@@ -157,6 +225,66 @@ let main = (config: PinballConfig) => {
       }
     }
   })
+}
+
+/**
+ * setLocationHash
+ *
+ * **it may not work properly with boolean values**
+ *
+ * @param location the location object of the page (window.location)
+ * @param updateObject an object containing values to set in the url
+ * @param deleteKeyArray an array containing keys to remove from the url
+ * @param updateIfPresentObject an object containing values to update only if already present in the URL
+ */
+let setLocationHash = (
+  location: Location,
+  updateObject: Record<string, string | number | boolean>,
+  deleteKeyArray: string[],
+  updateIfPresentObject: Record<string, string | number | boolean>,
+) => {
+  let hashArray = location.hash
+    .slice(1)
+    .split('#')
+    .map((entry) => {
+      let key = entry
+      let value: string | undefined = undefined
+      if (entry.includes('=')) {
+        let valueList: string[]
+        ;[key, ...valueList] = entry.split('=')
+        value = valueList.join('=')
+      }
+
+      // core activity: filtering and setting difficulty value
+      if (deleteKeyArray.includes(key)) {
+        return
+      } else if (updateObject[key] !== undefined) {
+        value = `${updateObject[key]}`
+        delete updateObject[key]
+      } else if (updateIfPresentObject[key] !== undefined) {
+        value = `${updateIfPresentObject[key]}`
+      }
+      // core activity end
+
+      if (value !== undefined) {
+        entry = `${key}=${value}`
+      }
+      return entry
+    })
+    .filter((x) => x !== undefined)
+
+  Object.entries(updateObject).map(([key, value]) => {
+    if (value === null || value === undefined) {
+      return
+    }
+    if (typeof value !== 'boolean') {
+      hashArray.push(`${key}=${value}`)
+    } else if (value === true) {
+      hashArray.push(key)
+    }
+  })
+
+  location.hash = hashArray.join('#')
 }
 
 // getting the configuration

@@ -1,13 +1,13 @@
 import * as pixi from 'pixi.js'
 import { PinballConfig } from '../config/config'
-import { Game, GridPosition } from '../type'
+import { Game, Position } from '../type'
 import { LayoutInfo } from './layout'
 
 export function drawBoard(
   game: Game,
   config: PinballConfig,
   layout: LayoutInfo,
-  clickCallback: (position: GridPosition) => void,
+  clickCallback: (position: Position) => void,
 ) {
   // Outer board
   let board = new pixi.Graphics()
@@ -52,9 +52,9 @@ export function createIndicator(
   game: Game,
   config: PinballConfig,
   layout: LayoutInfo,
-  column: number,
-  row: number,
-  callback: (p: GridPosition) => void,
+  x: number,
+  y: number,
+  callback: (p: Position) => void,
 ) {
   let { side, indicatorRadius: radius } = layout
 
@@ -66,8 +66,8 @@ export function createIndicator(
     g.drawCircle(0, 0, radius)
   }
   drawCircle(config.indicatorColor)
-  g.x = Math.floor(side / 2) + column * side
-  g.y = Math.floor(side / 2) + row * side
+  g.x = Math.floor(side / 2) + x * side
+  g.y = Math.floor(side / 2) + y * side
 
   g.interactive = true
 
@@ -84,7 +84,7 @@ export function createIndicator(
   })
 
   g.on('click', () => {
-    callback({ column, row })
+    callback({ x, y })
   })
 
   return g

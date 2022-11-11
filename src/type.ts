@@ -16,11 +16,6 @@ export interface Position {
   y: number
 }
 
-export type GridPosition = {
-  column: number
-  row: number
-}
-
 export interface Bumper extends Position {
   direction: BumperDirection
 }

@@ -1,8 +1,12 @@
 import clickUrl from 'url:../../asset/sound/click.mp3'
 import errorUrl from 'url:../../asset/sound/error.mp3'
 
-let createAudioManager = (url) => {
-  let audioArray = Array.from({ length: 10 }, () => new Audio(url))
+let createAudioManager = (url: string, { volume = 1 } = {}) => {
+  let audioArray = Array.from({ length: 10 }, () => {
+    let audio = new Audio(url)
+    audio.volume = volume
+    return audio
+  })
 
   let k = 0
   return {
@@ -13,5 +17,5 @@ let createAudioManager = (url) => {
   }
 }
 
-export const clickSound = createAudioManager(clickUrl)
+export const clickSound = createAudioManager(clickUrl, { volume: 0.25 })
 export const errorSound = createAudioManager(errorUrl)

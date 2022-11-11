@@ -12,6 +12,14 @@ export interface PinballConfig {
   size: number
   bumperCount: number
   /**
+   * remaining is the number of play until the score is displayed
+   */
+  remaining: number
+  /**
+   * score is the number of accumulated points while playing
+   */
+  score: number
+  /**
    * seed -- the seed of the game
    */
   seed: string
@@ -26,7 +34,7 @@ export interface PinballConfig {
   slateColor: number
   trailDotColor: number
   validTickColor: number
-  errorCrossColor: number
+  errorDiskColor: number
 }
 
 export function getConfig(location: Location) {
@@ -34,6 +42,8 @@ export function getConfig(location: Location) {
     difficulty: () => '4:5',
     size: ({ difficulty }) => +difficulty().split(':')[0],
     bumperCount: ({ difficulty }) => +difficulty().split(':')[1],
+    remaining: () => 7,
+    score: () => 0,
     // Seed
     seed: () => randomSeed(),
     // Colors
@@ -47,7 +57,7 @@ export function getConfig(location: Location) {
     slateColor: () => 0x38200a,
     trailDotColor: () => 0x604008,
     validTickColor: () => 0x60d038,
-    errorCrossColor: () => 0xf06028,
+    errorDiskColor: () => 0xf06028,
   })
 
   console.info(`#seed=${config.seed}`)
@@ -56,5 +66,3 @@ export function getConfig(location: Location) {
 
   return config
 }
-
-// export type PinballConfig = ReturnType<typeof getConfig>
