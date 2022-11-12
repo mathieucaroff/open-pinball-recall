@@ -1,8 +1,13 @@
 import { PinballConfig } from '../config/config'
-import { Grid, Start, Trail } from '../type'
+import { Counter, Grid, Start, Trail } from '../type'
 import { bumperTurn, moveFromDirection, opposite } from '../util'
 
-export let createTrail = (config: PinballConfig, start: Start, grid: Grid) => {
+export let createTrail = (
+  config: PinballConfig,
+  start: Start,
+  grid: Grid,
+  bumperCounter: Counter,
+) => {
   let trail = [] as Trail
   let cursor = {
     x: start.x,
@@ -21,6 +26,9 @@ export let createTrail = (config: PinballConfig, start: Start, grid: Grid) => {
       break
     }
     let bumper = grid[cursor.y - 1][cursor.x - 1]
+    if (bumper !== 'empty') {
+      bumperCounter.count += 1
+    }
     let enter = opposite(direction)
     let out = bumperTurn(bumper, enter)
     trail.push({ ...cursor, in: enter, out })

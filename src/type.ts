@@ -26,6 +26,10 @@ export type Grid = GridDirection[][]
 
 export type Start = Position & { direction: Direction }
 
+export interface Counter {
+  count: number
+}
+
 export interface Mark extends Position {
   in: Direction
   out: Direction

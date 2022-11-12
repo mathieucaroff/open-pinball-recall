@@ -1,6 +1,6 @@
 import { PRNG } from 'seedrandom'
 import { PinballConfig } from '../config/config'
-import { GridDirection, Game } from '../type'
+import { GridDirection, Game, Trail, Bumper } from '../type'
 import { createTrail } from './trail'
 import { createGrid } from './grid'
 import { createStart } from './start'
@@ -22,13 +22,31 @@ export function createGame(config: PinballConfig, random: PRNG): Game {
 
   let start = createStart(config, random)
 
-  let grid = createGrid<GridDirection>(config.size, 'empty')
+  let trail: Trail
+  let grid: GridDirection[][]
+  let bumperArray: Bumper[]
+
+  let k = 0
+  while (true) {
+    grid = createGrid<GridDirection>(config.size, 'empty')
+    bumperArray = createBumperArray(config, random, grid)
+    let bumperCounter = { count: 0 }
+    trail = createTrail(config, start, grid, bumperCounter)
+    if (bumperCounter.count >= 2) {
+      break
+    }
+    if (k > 1000) {
+      console.error('failed to get two or more bumpers on the ball path in 1000 attempts')
+      break
+    }
+    k += 1
+  }
 
   let game: Game = {
-    bumperArray: createBumperArray(config, random, grid),
+    bumperArray,
     grid,
     start,
-    trail: createTrail(config, start, grid),
+    trail,
     phase: 'initial',
   }
 
