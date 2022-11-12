@@ -1,40 +1,64 @@
 import * as pixi from 'pixi.js'
 import { default as packageJson } from '../package.json'
-import { default as seedrandom } from 'seedrandom'
+import { default as seedrandom, PRNG } from 'seedrandom'
 import { getConfig, PinballConfig } from './config/config'
 import { drawBoard } from './display/board'
-import { getLayout } from './display/layout'
+import { getLayout, LayoutInfo } from './display/layout'
 import { githubCornerHTML } from './lib/githubCorner'
 import { createGame as createGame } from './logic/game'
 import { drawBumperContainerAndFillGrid } from './display/bumper'
 import { drawBall } from './display/ball'
 import { drawStartArrow } from './display/arrow'
 import { drawTrail } from './display/trail'
-import { moveFromDirection, opposite } from './util'
-import { Position } from './type'
+import { moveFromDirection, onPointerDownOnce, opposite } from './util'
+import { Game, Position } from './type'
 import { clickSound, errorSound } from './audio/sound'
 import { createGrid } from './logic/grid'
 import { drawErrorDisk } from './display/error'
 import { Score } from './display/score'
 
-let main = (config: PinballConfig) => {
+let main = () => {
   // Github Corner
   document.body.innerHTML += githubCornerHTML(packageJson.repository, packageJson.version)
 
-  let random = seedrandom(config.seed)
-
-  let layout = getLayout(config)
-
-  let app = new pixi.Application({
-    backgroundColor: config.backgroundColor,
-  })
+  let app = new pixi.Application()
   document.body.appendChild(app.view)
 
-  let game = createGame(config, random)
+  let config: PinballConfig
+  let random: PRNG
+  let layout: LayoutInfo
+  let game: Game
+  let bumperGrid: (pixi.Graphics | 'nothing')[][]
+  let journey: number
 
-  let bumperGrid = createGrid<pixi.Graphics | 'nothing'>(config.size, 'nothing')
+  let configInit = (firstTime: boolean) => {
+    config = getConfig(location)
 
-  let journey = 0
+    if (firstTime) {
+      console.clear()
+      console.info('config', config)
+    }
+    console.info(`#seed=${config.seed}`)
+
+    random = seedrandom(config.seed)
+    layout = getLayout(config)
+    app.renderer.backgroundColor = config.backgroundColor
+    game = createGame(config, random)
+    bumperGrid = createGrid(config.size, 'nothing')
+    journey = 0
+    redraw()
+
+    resize()
+
+    if (firstTime) {
+      onPointerDownOnce(document.documentElement, startPlay)
+    } else {
+      setTimeout(() => {
+        startPlay()
+      }, 1000)
+    }
+  }
+  window.addEventListener('hashchange', () => configInit(false))
 
   let victory: boolean
 
@@ -98,8 +122,8 @@ let main = (config: PinballConfig) => {
     gameContainer.addChild(errorDisk)
     gameContainer.addChild(scoreContainer)
   }
-  redraw()
 
+  // resize handling
   let redrawTimeout: ReturnType<typeof setTimeout>
   let resize = () => {
     layout = getLayout(config)
@@ -107,11 +131,10 @@ let main = (config: PinballConfig) => {
     clearTimeout(redrawTimeout)
     redrawTimeout = setTimeout(redraw, 200)
   }
-  resize()
   window.addEventListener('resize', resize)
 
   // phase initial -> bumperView
-  setTimeout(() => {
+  let startPlay = () => {
     game.phase = 'bumperView'
     clickSound.play()
     bumperContainer.visible = true
@@ -123,8 +146,11 @@ let main = (config: PinballConfig) => {
       startArrow.visible = true
       clickSound.play()
     }, 2000)
-  }, 1000)
+  }
 
+  configInit(true)
+
+  // update loop
   pixi.Ticker.shared.add(() => {
     let { elapsedMS } = pixi.Ticker.shared
 
@@ -149,13 +175,7 @@ let main = (config: PinballConfig) => {
           }, 600)
         }
 
-        // Show the bumpers at the end
-        setTimeout(() => {
-          clickSound.play()
-          bumperContainer.children.forEach((g) => (g.visible = true))
-        }, 1000)
-
-        let handleEndClick = () => {
+        let handleEnd = () => {
           let { size, bumperCount, remaining, score, seed } = config
           if (victory) {
             bumperCount += 1
@@ -192,11 +212,19 @@ let main = (config: PinballConfig) => {
               },
             )
           }
-          window.removeEventListener('click', handleEndClick)
-          window.removeEventListener('touchend', handleEndClick)
         }
-        window.addEventListener('click', handleEndClick)
-        window.addEventListener('touchend', handleEndClick)
+
+        // Show the bumpers at the end
+        setTimeout(() => {
+          clickSound.play()
+          bumperContainer.children.forEach((g) => (g.visible = true))
+
+          if (config.clickyNext) {
+            onPointerDownOnce(document.documentElement, handleEnd)
+          } else {
+            setTimeout(handleEnd, 1500)
+          }
+        }, 1000)
       } else {
         // moving the ball
         let mark = game.trail[journey | 0]
@@ -290,10 +318,4 @@ let setLocationHash = (
 }
 
 // getting the configuration
-main(getConfig(location))
-
-window.addEventListener('hashchange', () => {
-  console.clear()
-  document.body.innerHTML = ''
-  main(getConfig(location))
-})
+main()

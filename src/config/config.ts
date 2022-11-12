@@ -5,6 +5,9 @@ function randomSeed() {
 }
 
 export interface PinballConfig {
+  /**
+   * difficulty specifies the size and the number of bumpers, separated by a colon `:`
+   */
   difficulty: string
   /**
    * size is the number of squares on the sides of the inner grid
@@ -23,6 +26,10 @@ export interface PinballConfig {
    * seed -- the seed of the game
    */
   seed: string
+  /**
+   * clickyNext specifies that the game should wait for the use to click before starting the next play
+   */
+  clickyNext: boolean
   // Colors
   backgroundColor: number
   ballColor: number
@@ -46,6 +53,7 @@ export function getConfig(location: Location) {
     score: () => 0,
     // Seed
     seed: () => randomSeed(),
+    clickyNext: () => false,
     // Colors
     backgroundColor: () => 0x503010,
     ballColor: () => 0x18b0e8,
@@ -59,10 +67,6 @@ export function getConfig(location: Location) {
     validTickColor: () => 0x60d038,
     errorDiskColor: () => 0xf06028,
   })
-
-  console.info(`#seed=${config.seed}`)
-
-  console.info('config', config)
 
   return config
 }

@@ -62,3 +62,14 @@ export let moveFromDirection = (d: Direction): Position => {
     right: { x: 1, y: 0 },
   }[d]
 }
+
+export let onPointerDownOnce = (element: HTMLElement, callback: () => void) => {
+  let handler = () => {
+    element.removeEventListener('click', handler)
+    element.removeEventListener('touchend', handler)
+    callback()
+  }
+
+  element.addEventListener('click', handler)
+  element.addEventListener('touchend', handler)
+}
