@@ -17,5 +17,5 @@ let createAudioManager = (url: string, { volume = 1 } = {}) => {
   }
 }
 
-export const clickSound = createAudioManager(clickUrl, { volume: 0.25 })
+export const clickSound = createAudioManager(clickUrl)
 export const errorSound = createAudioManager(errorUrl)

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.2] - 2022-11-12
+
+### Added
+
+- the levels are now generated with the constraint that the ball must hit at least two bumpers
+
+### Changed
+
+- the switching from one level to the next is now smoother and does not requires clicking
+  - the `clickyNext` parameter restores the former behaviour
+
 ## [v0.1.1] - 2022-11-11
 
 ### Added
