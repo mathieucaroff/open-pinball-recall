@@ -17,6 +17,7 @@ import { createGrid } from './logic/grid'
 import { drawErrorDisk } from './display/error'
 import { drawScore } from './display/score'
 import { drawIntroduction } from './display/introduction'
+import { drawPlayAgain } from './display/playAgain'
 
 let main = () => {
   // Github Corner
@@ -31,7 +32,7 @@ let main = () => {
   let game: Game
   let bumperGrid: (pixi.Graphics | 'nothing')[][]
   let journey: number
-  let scoreText: string = ''
+  let scoreText: string
 
   let configInit = (firstTime: boolean) => {
     config = getConfig(location)
@@ -48,6 +49,7 @@ let main = () => {
     game = createGame(config, random, firstTime)
     bumperGrid = createGrid(config.size, 'nothing')
     journey = 0
+    scoreText = ''
     redraw()
 
     resize()
@@ -74,6 +76,7 @@ let main = () => {
   let errorDisk: pixi.Container
   let scoreContainer: pixi.Text
   let introductionContainer: pixi.Text
+  let playAgainContainer: pixi.Text
 
   // guess is where the player guessed the ball would land
   let guess: Position
@@ -99,6 +102,7 @@ let main = () => {
     errorDisk = drawErrorDisk(config.errorDiskColor, layout)
     scoreContainer = drawScore(layout, scoreText)
     introductionContainer = drawIntroduction(layout)
+    playAgainContainer = drawPlayAgain(layout)
 
     // visibility
     bumperContainer.visible = ['bumperView', 'result', 'end'].includes(game.phase)
@@ -115,6 +119,7 @@ let main = () => {
     }
     errorDisk.visible = false
     introductionContainer.visible = game.phase === 'introduction'
+    playAgainContainer.visible = game.phase === 'playAgain'
 
     gameContainer.x = layout.boardBase.x
     gameContainer.y = layout.boardBase.y
@@ -128,6 +133,7 @@ let main = () => {
     gameContainer.addChild(errorDisk)
     gameContainer.addChild(scoreContainer)
     gameContainer.addChild(introductionContainer)
+    gameContainer.addChild(playAgainContainer)
   }
 
   // resize handling
@@ -216,6 +222,14 @@ let main = () => {
             bumperContainer.visible = false
             trail.visible = false
             redraw()
+            onPointerDownOnce(document.documentElement, () => {
+              game.phase = 'playAgain'
+              scoreText = ''
+              redraw()
+              onPointerDownOnce(document.documentElement, () => {
+                setLocationHash(location, {}, ['remaining', 'score'], { seed: seedAddOne(seed) })
+              })
+            })
           } else {
             remaining -= 1
             setLocationHash(
@@ -227,7 +241,7 @@ let main = () => {
               },
               ['size', 'bumperCount'],
               {
-                seed: (parseInt(seed, 36) + 1).toString(36),
+                seed: seedAddOne(seed),
               },
             )
           }
@@ -336,5 +350,6 @@ let setLocationHash = (
   location.hash = hashArray.join('#')
 }
 
-// getting the configuration
+let seedAddOne = (seed: string) => (parseInt(seed, 36) + 1).toString(36)
+
 main()

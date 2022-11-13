@@ -38,7 +38,15 @@ export interface Mark extends Position {
 
 export type Trail = Mark[]
 
-export type Phase = 'introduction' | 'initial' | 'bumperView' | 'guess' | 'result' | 'end' | 'score'
+export type Phase =
+  | 'introduction'
+  | 'initial'
+  | 'bumperView'
+  | 'guess'
+  | 'result'
+  | 'end'
+  | 'score'
+  | 'playAgain'
 
 export interface Game {
   grid: Grid
