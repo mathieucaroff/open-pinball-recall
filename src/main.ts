@@ -15,7 +15,8 @@ import { Game, Position } from './type'
 import { clickSound, errorSound } from './audio/sound'
 import { createGrid } from './logic/grid'
 import { drawErrorDisk } from './display/error'
-import { Score } from './display/score'
+import { drawScore } from './display/score'
+import { drawIntroduction } from './display/introduction'
 
 let main = () => {
   // Github Corner
@@ -30,6 +31,7 @@ let main = () => {
   let game: Game
   let bumperGrid: (pixi.Graphics | 'nothing')[][]
   let journey: number
+  let scoreText: string = ''
 
   let configInit = (firstTime: boolean) => {
     config = getConfig(location)
@@ -43,7 +45,7 @@ let main = () => {
     random = seedrandom(config.seed)
     layout = getLayout(config)
     app.renderer.backgroundColor = config.backgroundColor
-    game = createGame(config, random)
+    game = createGame(config, random, firstTime)
     bumperGrid = createGrid(config.size, 'nothing')
     journey = 0
     redraw()
@@ -51,6 +53,7 @@ let main = () => {
     resize()
 
     if (firstTime) {
+      introductionContainer.visible = true
       onPointerDownOnce(document.documentElement, startPlay)
     } else {
       setTimeout(() => {
@@ -69,7 +72,8 @@ let main = () => {
   let trail: pixi.Container
   let ball: pixi.Container
   let errorDisk: pixi.Container
-  let scoreContainer: Score
+  let scoreContainer: pixi.Text
+  let introductionContainer: pixi.Text
 
   // guess is where the player guessed the ball would land
   let guess: Position
@@ -93,7 +97,8 @@ let main = () => {
     trail = drawTrail(config.trailDotColor, layout, game.trail)
     ball = drawBall(config, layout, game)
     errorDisk = drawErrorDisk(config.errorDiskColor, layout)
-    scoreContainer = new Score(layout)
+    scoreContainer = drawScore(layout, scoreText)
+    introductionContainer = drawIntroduction(layout)
 
     // visibility
     bumperContainer.visible = ['bumperView', 'result', 'end'].includes(game.phase)
@@ -101,6 +106,7 @@ let main = () => {
     trail.children.forEach((g, k) => {
       g.visible = k < 2 * journey
     })
+    trail.visible = ['result', 'end'].includes(game.phase)
     ball.visible = ['result', 'end'].includes(game.phase)
     if (game.phase === 'end') {
       let mark = game.trail.slice(-1)[0]
@@ -108,7 +114,7 @@ let main = () => {
       ball.y = (mark.y + 0.5) * layout.side
     }
     errorDisk.visible = false
-    // scoreContainer.visible = false
+    introductionContainer.visible = game.phase === 'introduction'
 
     gameContainer.x = layout.boardBase.x
     gameContainer.y = layout.boardBase.y
@@ -121,6 +127,7 @@ let main = () => {
     gameContainer.addChild(ball)
     gameContainer.addChild(errorDisk)
     gameContainer.addChild(scoreContainer)
+    gameContainer.addChild(introductionContainer)
   }
 
   // resize handling
@@ -135,6 +142,8 @@ let main = () => {
 
   // phase initial -> bumperView
   let startPlay = () => {
+    introductionContainer.visible = false
+
     game.phase = 'bumperView'
     clickSound.play()
     bumperContainer.visible = true
@@ -156,6 +165,7 @@ let main = () => {
 
     if (game.phase === 'result') {
       ball.visible = true
+      trail.visible = true
 
       journey += elapsedMS / 256
 
@@ -193,10 +203,12 @@ let main = () => {
           }
 
           if (config.remaining <= 0) {
-            scoreContainer.visible = true
-            scoreContainer.setText(`Score:\n${score}`)
+            game.phase = 'score'
+            scoreText = `Score:\n${score}`
+            scoreContainer.text = scoreText
             bumperContainer.visible = false
             trail.visible = false
+            redraw()
           } else {
             remaining -= 1
             setLocationHash(

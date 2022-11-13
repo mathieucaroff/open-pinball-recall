@@ -6,7 +6,7 @@ import { createGrid } from './grid'
 import { createStart } from './start'
 import { createBumperArray } from './bumperArray'
 
-export function createGame(config: PinballConfig, random: PRNG): Game {
+export function createGame(config: PinballConfig, random: PRNG, firstTime: boolean): Game {
   if (config.bumperCount > config.size ** 2) {
     console.error(
       'Cannot afford',
@@ -47,7 +47,7 @@ export function createGame(config: PinballConfig, random: PRNG): Game {
     grid,
     start,
     trail,
-    phase: 'initial',
+    phase: firstTime ? 'introduction' : 'initial',
   }
 
   return game

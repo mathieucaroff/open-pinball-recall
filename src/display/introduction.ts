@@ -1,15 +1,16 @@
 import * as pixi from 'pixi.js'
 import { LayoutInfo } from './layout'
 
-export function drawScore(layout: LayoutInfo, scoreText: string) {
+export function drawIntroduction(layout: LayoutInfo) {
   let { side } = layout
+
   let text = new pixi.Text(
-    scoreText,
+    'Click or tap to\nstart the game',
     new pixi.TextStyle({
       fill: '#c7b59d',
       fontFamily: 'Arial',
-      fontSize: side,
-      strokeThickness: side / 10,
+      fontSize: side / 2,
+      strokeThickness: side / 20,
       align: 'center',
     }),
   )
