@@ -195,11 +195,18 @@ let main = () => {
           }
 
           if (bumperCount < 3 * size - 10) {
-            size -= 1
-            bumperCount += 2
+            if (size > 3) {
+              // ^ refuse to go below a size of 3
+              size -= 1
+              bumperCount += 2
+            }
           } else if (bumperCount > 3 * size - 5) {
             size += 1
             bumperCount -= 2
+          }
+
+          if (bumperCount < 2) {
+            bumperCount = 2
           }
 
           if (config.remaining <= 0) {
