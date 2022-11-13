@@ -2,14 +2,14 @@ import * as pixi from 'pixi.js'
 import { LayoutInfo } from './layout'
 
 export function drawScore(layout: LayoutInfo, scoreText: string) {
-  let { side } = layout
+  let { boardSize } = layout
   let text = new pixi.Text(
     scoreText,
     new pixi.TextStyle({
       fill: '#c7b59d',
       fontFamily: 'Arial',
-      fontSize: side,
-      strokeThickness: side / 10,
+      fontSize: boardSize / 8,
+      strokeThickness: boardSize / 80,
       align: 'center',
     }),
   )
