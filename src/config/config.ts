@@ -15,6 +15,21 @@ export interface PinballConfig {
   size: number
   bumperCount: number
   /**
+   * baseBumperDisplayTimeoutMs is the base time that the game waits while
+   * displaying the bumpers to the player. The actual time will be longer than
+   * the base proportionally to the number of bumpers.
+   *
+   * It is expressed in milliseconds
+   */
+  baseBumperDisplayTimeoutMs: number
+  /**
+   * extraBumperDisplayTimeoutMs is multiplied by the number of bumpers and
+   * added to the base timeout.
+   *
+   * It is expressed in milliseconds
+   */
+  extraBumperDisplayTimeoutMs: number
+  /**
    * remaining is the number of play until the score is displayed
    */
   remaining: number
@@ -49,6 +64,8 @@ export function getConfig(location: Location) {
     difficulty: () => '4:5',
     size: ({ difficulty }) => +difficulty().split(':')[0],
     bumperCount: ({ difficulty }) => +difficulty().split(':')[1],
+    baseBumperDisplayTimeoutMs: () => 2000,
+    extraBumperDisplayTimeoutMs: () => 200,
     remaining: () => 7,
     score: () => 0,
     // Seed

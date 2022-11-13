@@ -160,7 +160,7 @@ let main = () => {
       bumperContainer.visible = false
       startArrow.visible = true
       clickSound.play()
-    }, 2000)
+    }, config.baseBumperDisplayTimeoutMs + config.extraBumperDisplayTimeoutMs * config.bumperCount)
   }
 
   configInit(true)

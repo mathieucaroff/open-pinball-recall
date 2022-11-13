@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.3] - 2022-11-13
+
+### Added
+
+- There is now a minimum value for the size of the grid (3x3) and the number of bumpers (2).
+- Clicking on the score screen leads to the 'Play again?' screen which starts a new game when clicked.
+- The time waited while displaying the bumpers is now an affine function of tth number of bumpers.
+
+### Changed
+
+- the text size is now based on the board size rather than the cell size
+
 ## [v0.1.2] - 2022-11-12
 
 ### Added
