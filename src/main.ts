@@ -14,7 +14,7 @@ import { moveFromDirection, onPointerDownOnce, opposite } from './util'
 import { Game, Position } from './type'
 import { bellSound, clickSound, errorSound, successSound } from './audio/sound'
 import { createGrid } from './logic/grid'
-import { drawErrorDisk } from './display/error'
+import { drawDisk } from './display/disk'
 import { drawScore } from './display/score'
 import { drawIntroduction } from './display/introduction'
 import { drawPlayAgain } from './display/playAgain'
@@ -74,6 +74,7 @@ let main = () => {
   let trail: pixi.Container
   let ball: pixi.Container
   let errorDisk: pixi.Container
+  let successDisk: pixi.Container
   let scoreContainer: pixi.Text
   let introductionContainer: pixi.Text
   let playAgainContainer: pixi.Text
@@ -99,7 +100,11 @@ let main = () => {
     startArrow = drawStartArrow(config.ballColor, layout.ballStrokeWidth, layout.side, game.start)
     trail = drawTrail(config.trailDotColor, layout, game.trail)
     ball = drawBall(config, layout, game)
-    errorDisk = drawErrorDisk(config.errorDiskColor, layout)
+    errorDisk = drawDisk(
+      config.errorDiskColor,
+      layout.indicatorRadius - layout.indicatorStrokeWidth / 2,
+    )
+    successDisk = drawDisk(config.successDiskColor, layout.ballRadius, layout.ballStrokeWidth)
     scoreContainer = drawScore(layout, scoreText)
     introductionContainer = drawIntroduction(layout)
     playAgainContainer = drawPlayAgain(layout)
@@ -118,6 +123,7 @@ let main = () => {
       ball.y = (mark.y + 0.5) * layout.side
     }
     errorDisk.visible = false
+    successDisk.visible = false
     introductionContainer.visible = game.phase === 'introduction'
     playAgainContainer.visible = game.phase === 'playAgain'
 
@@ -131,6 +137,7 @@ let main = () => {
     gameContainer.addChild(bumperContainer)
     gameContainer.addChild(ball)
     gameContainer.addChild(errorDisk)
+    gameContainer.addChild(successDisk)
     gameContainer.addChild(scoreContainer)
     gameContainer.addChild(introductionContainer)
     gameContainer.addChild(playAgainContainer)
@@ -177,19 +184,24 @@ let main = () => {
 
       if (journey > game.trail.length - 0.5) {
         game.phase = 'end'
+
         let target = game.trail.slice(-1)[0]
         victory = target.x === guess.x && target.y === guess.y
+
+        let disk: pixi.Container
         if (victory) {
           successSound.play()
+          disk = successDisk
         } else {
           errorSound.play()
-          errorDisk.x = layout.side * (guess.x + 0.5)
-          errorDisk.y = layout.side * (guess.y + 0.5)
-          errorDisk.visible = true
-          setTimeout(() => {
-            errorDisk.visible = false
-          }, 1000)
+          disk = errorDisk
         }
+        disk.x = layout.side * (guess.x + 0.5)
+        disk.y = layout.side * (guess.y + 0.5)
+        disk.visible = true
+        setTimeout(() => {
+          disk.visible = false
+        }, 1000)
 
         let handleEnd = () => {
           let { size, bumperCount, remaining, score, seed } = config

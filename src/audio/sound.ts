@@ -3,6 +3,10 @@ import clickUrl from 'url:../../asset/sound/click.mp3'
 import errorUrl from 'url:../../asset/sound/error.mp3'
 import successUrl from 'url:../../asset/sound/success.mp3'
 
+export interface AudioManager {
+  play: () => void
+}
+
 let createAudioManager = (url: string, { volume = 1 } = {}) => {
   let audioArray = Array.from({ length: 10 }, () => {
     let audio = new Audio(url)

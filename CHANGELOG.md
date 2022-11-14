@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.4] - 2022-11-14
+
+### Added
+
+- Two new sound effect have been added: one for when the ball hits a bumper and one for when the ball reaches the predicted destination.
+- The game now has a browser icon
+- A green disk is now displayed when the ball reaches the predicited destination.
+
 ## [v0.1.3] - 2022-11-13
 
 ### Added

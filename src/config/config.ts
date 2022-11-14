@@ -55,7 +55,7 @@ export interface PinballConfig {
   indicatorStrokeColor: number
   slateColor: number
   trailDotColor: number
-  validTickColor: number
+  successDiskColor: number
   errorDiskColor: number
 }
 
@@ -81,7 +81,7 @@ export function getConfig(location: Location) {
     indicatorHoverColor: () => 0xfcf0bc,
     slateColor: () => 0x38200a,
     trailDotColor: () => 0x604008,
-    validTickColor: () => 0x60d038,
+    successDiskColor: () => 0x60d038,
     errorDiskColor: () => 0xff0000,
   })
 
