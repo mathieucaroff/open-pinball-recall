@@ -12,7 +12,7 @@ import { drawStartArrow } from './display/arrow'
 import { drawTrail } from './display/trail'
 import { moveFromDirection, onPointerDownOnce, opposite } from './util'
 import { Game, Position } from './type'
-import { clickSound, errorSound } from './audio/sound'
+import { bellSound, clickSound, errorSound, successSound } from './audio/sound'
 import { createGrid } from './logic/grid'
 import { drawErrorDisk } from './display/error'
 import { drawScore } from './display/score'
@@ -180,7 +180,7 @@ let main = () => {
         let target = game.trail.slice(-1)[0]
         victory = target.x === guess.x && target.y === guess.y
         if (victory) {
-          clickSound.play()
+          successSound.play()
         } else {
           errorSound.play()
           errorDisk.x = layout.side * (guess.x + 0.5)
@@ -188,7 +188,7 @@ let main = () => {
           errorDisk.visible = true
           setTimeout(() => {
             errorDisk.visible = false
-          }, 600)
+          }, 1000)
         }
 
         let handleEnd = () => {
@@ -262,7 +262,7 @@ let main = () => {
         // moving the ball
         let mark = game.trail[journey | 0]
         if (journey % 1 >= 0.5 && mark.in !== opposite(mark.out) && !mark.revealed) {
-          clickSound.play()
+          bellSound.play()
           let bumper = bumperGrid[mark.y - 1][mark.x - 1]
           if (bumper === 'nothing') {
             throw new Error(

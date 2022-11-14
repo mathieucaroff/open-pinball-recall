@@ -1,5 +1,7 @@
+import bellUrl from 'url:../../asset/sound/bell.mp3'
 import clickUrl from 'url:../../asset/sound/click.mp3'
 import errorUrl from 'url:../../asset/sound/error.mp3'
+import successUrl from 'url:../../asset/sound/success.mp3'
 
 let createAudioManager = (url: string, { volume = 1 } = {}) => {
   let audioArray = Array.from({ length: 10 }, () => {
@@ -17,5 +19,7 @@ let createAudioManager = (url: string, { volume = 1 } = {}) => {
   }
 }
 
+export const bellSound = createAudioManager(bellUrl)
 export const clickSound = createAudioManager(clickUrl)
 export const errorSound = createAudioManager(errorUrl)
+export const successSound = createAudioManager(successUrl, { volume: 0.6 })

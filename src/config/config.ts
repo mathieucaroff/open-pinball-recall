@@ -82,7 +82,7 @@ export function getConfig(location: Location) {
     slateColor: () => 0x38200a,
     trailDotColor: () => 0x604008,
     validTickColor: () => 0x60d038,
-    errorDiskColor: () => 0xf06028,
+    errorDiskColor: () => 0xff0000,
   })
 
   return config
