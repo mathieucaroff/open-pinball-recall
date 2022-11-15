@@ -75,15 +75,21 @@ export function createIndicator(
 
   g.on('mouseover', () => {
     if (game.phase === 'guess') {
-      drawCircle(config.indicatorHoverColor)
+      drawCircle(config.indicatorLitColor)
     }
   })
 
   g.on('mouseout', () => {
+    if (['result', 'end'].includes(game.phase)) {
+      return
+    }
     drawCircle(config.indicatorColor)
   })
 
   g.on('pointerdown', () => {
+    if (game.phase === 'guess') {
+      drawCircle(config.indicatorLitColor)
+    }
     callback({ x, y })
   })
 

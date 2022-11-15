@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.5] - 2022-11-15
+
+### Added
+
+- The game can now be played on Android Chrome as the display scaling issues have been resolved
+- The exit indicator now stays lit after being clicked or tapped
+
+### Changed
+
+- The final position of the ball is now always the center of the square it lands on
+
 ## [v0.1.4] - 2022-11-14
 
 ### Added
@@ -19,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- There is now a minimum value for the size of the grid (3x3) and the number of bumpers (2).
+- There is now a minimum value for the size of the grid (3x3) and for the number of bumpers (2).
 - Clicking on the score screen leads to the 'Play again?' screen which starts a new game when clicked.
 - The time waited while displaying the bumpers is now an affine function of tth number of bumpers.
 

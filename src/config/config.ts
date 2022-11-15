@@ -51,7 +51,7 @@ export interface PinballConfig {
   boardColor: number
   bumperColor: number
   indicatorColor: number
-  indicatorHoverColor: number
+  indicatorLitColor: number
   indicatorStrokeColor: number
   slateColor: number
   trailDotColor: number
@@ -78,7 +78,7 @@ export function getConfig(location: Location) {
     bumperColor: () => 0xffffff,
     indicatorColor: () => 0x805028,
     indicatorStrokeColor: () => 0x3a200a,
-    indicatorHoverColor: () => 0xfcf0bc,
+    indicatorLitColor: () => 0xfcf0bc,
     slateColor: () => 0x38200a,
     trailDotColor: () => 0x604008,
     successDiskColor: () => 0x60d038,
