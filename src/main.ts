@@ -185,6 +185,10 @@ let main = () => {
       if (journey > game.trail.length - 0.5) {
         game.phase = 'end'
 
+        let mark = game.trail.slice(-1)[0]
+        ball.x = (mark.x + 0.5) * layout.side
+        ball.y = (mark.y + 0.5) * layout.side
+
         let target = game.trail.slice(-1)[0]
         victory = target.x === guess.x && target.y === guess.y
 
