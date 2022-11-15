@@ -22,12 +22,12 @@ export interface LayoutInfo {
   ballStrokeWidth: number
 }
 
-export function getLayout(config: PinballConfig) {
+export function getLayout(window: Window, canvas: HTMLCanvasElement, config: PinballConfig) {
   return indirectResolve<LayoutInfo>({
     size: () => config.size,
     // Sizes and positions
-    width: () => window.innerWidth - 3,
-    height: () => window.innerHeight - 4,
+    width: () => canvas.clientWidth * window.devicePixelRatio,
+    height: () => canvas.clientHeight * window.devicePixelRatio,
     side: ({ size, width, height }) => Math.floor(Math.min(width(), height()) / (size() + 2)),
     boardSize: ({ size, side }) => side() * (size() + 2),
     boardBase: ({ width, height, boardSize }) => ({

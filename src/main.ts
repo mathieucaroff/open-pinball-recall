@@ -44,7 +44,7 @@ let main = () => {
     console.info(`#seed=${config.seed}`)
 
     random = seedrandom(config.seed)
-    layout = getLayout(config)
+    layout = getLayout(window, app.view, config)
     app.renderer.backgroundColor = config.backgroundColor
     game = createGame(config, random, firstTime)
     bumperGrid = createGrid(config.size, 'nothing')
@@ -146,7 +146,7 @@ let main = () => {
   // resize handling
   let redrawTimeout: ReturnType<typeof setTimeout>
   let resize = () => {
-    layout = getLayout(config)
+    layout = getLayout(window, app.view, config)
     app.renderer.resize(layout.width, layout.height)
     clearTimeout(redrawTimeout)
     redrawTimeout = setTimeout(redraw, 200)
