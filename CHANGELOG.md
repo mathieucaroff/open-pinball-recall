@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.6] - 2022-11-16
+
+### Changed
+
+- The bell sound pitch has been lowered.
+
 ## [v0.1.5] - 2022-11-15
 
 ### Added
